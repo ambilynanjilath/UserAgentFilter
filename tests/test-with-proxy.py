@@ -4,7 +4,7 @@ from UserAgentFilter import UserAgentTester
 
 class TestUserAgentTester(unittest.TestCase):
     def setUp(self):
-        self.test_url = 'https://www.swiggy.com/'  # Replace with a test URL
+        self.test_url = 'https://www.net-a-porter.com/'  # Replace with a test URL
         self.delay_range = (3, 5)
         self.user_agents_file = 'tests/user_agents.txt'
         self.output_file = 'tests/filtered_test.txt'
