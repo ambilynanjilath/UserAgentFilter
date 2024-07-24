@@ -1,9 +1,14 @@
 import requests
 import time
 import random
+import urllib3
+
+
 
 class UserAgentTester:
     def __init__(self, test_url, proxy=None, timeout=10, max_retries=3, delay_range=(3, 8)):
+        # Disable InsecureRequestWarnings
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
         """
         Initialize the UserAgentTester class.
 

@@ -1,6 +1,6 @@
 import unittest
 import os
-from user_agent_filter import UserAgentTester
+from UserAgentFilter import UserAgentTester
 
 class TestUserAgentTester(unittest.TestCase):
     def setUp(self):
