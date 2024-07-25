@@ -1,4 +1,5 @@
 # UserAgentFilter
+![UserAgentFilter Logo](https://github.com/ambilynanjilath/UserAgentFilter/blob/main/logo.png)
 
 **UserAgentFilter** is a Python package designed for testing user agents on specific websites. It helps in identifying which user agents are effective for web scraping or automated testing by filtering out those that work or fail.
 
