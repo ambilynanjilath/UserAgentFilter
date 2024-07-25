@@ -5,7 +5,10 @@
 ## Key Features
 - Tests a list of user agents against a specified website.
 - Supports optional proxy configuration.
+- Handles errors and retries for transient issues.
+- Random delays between requests to mimic human browsing behavior.
 - Outputs results in a text file for easy review.
+
 
 ## Installation
 
@@ -22,12 +25,21 @@ Here's a quick example of how to use the `UserAgentTester` class to filter user 
 ```python
 from UserAgentFilter import UserAgentTester
 
-# Create an instance of UserAgentFilter with a proxy
-filter = UserAgentTester(
-    test_url='https://www.swiggy.com/',
-    delay_range=(5, 7)
+# Initialize the tester with a target URL and optional proxy settings
+tester = UserAgentTester(
+    test_url='https://www.example.com',
+    proxy={'http': 'http://your_proxy:port', 'https': 'https://your_proxy:port'},
+    timeout=10,
+    max_retries=3,
+    delay_range=(3, 8)
 )
-filter.filter_user_agents(
-    user_agents_file='user_agents.txt',
-    output_file='filtered.txt'
+
+# Filter user agents from a file and save the successful ones to another file
+tester.filter_user_agents(
+    user_agents_file='tests/user_agents.txt',
+    output_file='filtered_user_agents.txt'
 )
+
+)
+
+
