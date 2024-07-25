@@ -4,10 +4,15 @@ import random
 import urllib3
 
 
-
 class UserAgentTester:
+    """
+    A class for testing user agents against a specific website to determine their effectiveness.
+
+    This class provides functionality to test user agents by sending HTTP requests to a specified URL.
+    It handles errors, retries requests for transient issues, and applies random delays to mimic human behavior.
+    """
     def __init__(self, test_url, proxy=None, timeout=10, max_retries=3, delay_range=(3, 8)):
-        # Disable InsecureRequestWarnings
+        # Disable InsecureRequestWarnings from urllib3
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
         """
         Initialize the UserAgentTester class.
@@ -39,14 +44,80 @@ class UserAgentTester:
 
     def check_user_agent(self, user_agent):
         """
-        Test if a user agent is valid for the given website with enhanced error handling.
+    Test if a user agent is valid for the given website with enhanced error handling.
 
-        Args:
-            user_agent (str): The user agent string to test.
+    This method sends an HTTP GET request to the specified URL using the provided user agent.
+    It includes robust error handling for various HTTP responses and exceptions that might occur
+    during the request. The method also attempts to retry requests for transient errors like timeouts.
 
-        Returns:
-            bool: True if the user agent is accepted (HTTP status 200), False otherwise.
-        """
+    Args:
+        user_agent (str): The user agent string to test.
+
+    Returns:
+        bool: True if the user agent is accepted (HTTP status 200), False otherwise.
+
+    Method Details:
+    ---------------
+    - A new requests session is created to maintain certain settings across requests, such as headers
+      and proxies.
+    
+    - If a proxy is specified during the initialization of the UserAgentTester class, the session's
+      proxy settings are updated accordingly to route requests through the given proxy.
+    
+    - A retry counter is initialized to keep track of the number of attempts made to send the request.
+      The method will retry sending the request up to a maximum number of retries specified during
+      initialization (`self.max_retries`).
+    
+    - A loop is employed to allow for multiple attempts to send the request, particularly in cases
+      where transient errors like timeouts are encountered.
+    
+    - Inside the loop:
+        - The 'User-Agent' header in `self.common_headers` is updated to the current `user_agent`
+          being tested.
+        
+        - An HTTP GET request is sent to the `self.test_url` using the specified headers, timeout
+          setting (`self.timeout`), and with SSL verification disabled (`verify=False`).
+        
+        - The HTTP response status code is checked to determine the outcome:
+            - **Status Code 200**: Indicates that the user agent is accepted. A success message is
+              printed and the method returns True.
+            
+            - **Status Code 403 (Forbidden)**: Indicates that the user agent is blocked by the server.
+              A warning message is printed and the method returns False.
+            
+            - **Status Code 300 to <400 (Redirection)**: Indicates a redirect response. A message is
+              printed indicating the redirection, and the method returns False.
+            
+            - **Status Code 400 to <500 (Client Error)**: Indicates a client error occurred, possibly
+              due to the user agent. A message is printed and the method returns False.
+            
+            - **Status Code 500 to <600 (Server Error)**: Indicates a server error occurred. A message
+              is printed and the method returns False.
+            
+            - **Other Status Codes**: For any other unexpected status codes, a warning message is
+              printed and the method returns False.
+    
+    - If a request exception occurs, it is handled using multiple `except` blocks:
+        - **Timeout Exception**: If a timeout occurs, a message is printed and the retry counter is
+          incremented. If the retry limit is reached, a failure message is printed and the method
+          returns False.
+        
+        - **ConnectionError Exception**: If a connection error occurs, a message is printed and the
+          method returns False.
+        
+        - **ProxyError Exception**: If a proxy error occurs, a message is printed indicating the
+          failure to connect using the proxy, and the method returns False.
+        
+        - **InvalidURL Exception**: If the URL is invalid, an error message is printed and the method
+          returns False.
+        
+        - **General RequestException**: Handles any other exceptions related to the request. A message
+          is printed with the exception details and the method returns False.
+    
+        This method effectively manages and tests user agents by handling a wide range of response
+        scenarios and exceptions, making it a robust solution for testing user agents in web scraping
+        applications.
+         """
         # Create a new requests session for making HTTP requests
         session = requests.Session()
 
@@ -54,80 +125,158 @@ class UserAgentTester:
         if self.proxy:
             session.proxies.update(self.proxy)
 
-        retries = 0
+        retries = 0  # Initialize the retry counter
         while retries < self.max_retries:
             try:
                 # Set the User-Agent header for the current request
                 self.common_headers['User-Agent'] = user_agent
 
                 # Send an HTTP GET request to the test URL with the specified headers and proxy
-                response = session.get(self.test_url, headers=self.common_headers, timeout=self.timeout, verify=False)
+                response = session.get(
+                    self.test_url, headers=self.common_headers, timeout=self.timeout, verify=False)
 
                 # Check the HTTP status code to determine if the user agent is accepted
                 if response.status_code == 200:
-                    print(f"User-Agent '{user_agent}' is working for {self.test_url}.")
+                    print(
+                        f"User-Agent '{user_agent}' is working for {self.test_url}.")
                     return True  # User agent is accepted
                 elif response.status_code == 403:
-                    print(f"Warning: User-Agent '{user_agent}' is blocked with status code 403 Forbidden for {self.test_url}.")
+                    print(
+                        f"Warning: User-Agent '{user_agent}' is blocked with status code 403 Forbidden for {self.test_url}.")
                     return False  # User agent is blocked
                 elif 300 <= response.status_code < 400:
-                    print(f"Redirected: User-Agent '{user_agent}' received a redirect status code {response.status_code} for {self.test_url}.")
+                    print(
+                        f"Redirected: User-Agent '{user_agent}' received a redirect status code {response.status_code} for {self.test_url}.")
                     return False  # User agent caused a redirect
                 elif 400 <= response.status_code < 500:
-                    print(f"Client error: User-Agent '{user_agent}' received a client error status code {response.status_code} for {self.test_url}.")
+                    print(
+                        f"Client error: User-Agent '{user_agent}' received a client error status code {response.status_code} for {self.test_url}.")
                     return False  # User agent caused a client error
                 elif 500 <= response.status_code < 600:
-                    print(f"Server error: User-Agent '{user_agent}' received a server error status code {response.status_code} for {self.test_url}.")
+                    print(
+                        f"Server error: User-Agent '{user_agent}' received a server error status code {response.status_code} for {self.test_url}.")
                     return False  # User agent caused a server error
                 else:
-                    print(f"Warning: User-Agent '{user_agent}' is not working. Status code: {response.status_code} for {self.test_url}.")
+                    print(
+                        f"Warning: User-Agent '{user_agent}' is not working. Status code: {response.status_code} for {self.test_url}.")
                     return False  # User agent is not working
             except requests.exceptions.Timeout:
-                print(f"Timeout: Request for User-Agent '{user_agent}' timed out for {self.test_url}. Retrying...")
+                # If a timeout exception occurs, increment the retry counter and try again
+                print(
+                    f"Timeout: Request for User-Agent '{user_agent}' timed out for {self.test_url}. Retrying...")
                 retries += 1
                 if retries >= self.max_retries:
-                    print(f"Failed: User-Agent '{user_agent}' failed due to repeated timeouts for {self.test_url}.")
+                    # If the maximum number of retries is reached, return False
+                    print(
+                        f"Failed: User-Agent '{user_agent}' failed due to repeated timeouts for {self.test_url}.")
                     return False
             except requests.exceptions.ConnectionError:
-                print(f"Connection error: Failed to connect to {self.test_url} with User-Agent '{user_agent}'.")
+                # If a connection error occurs, print an error message and return False
+                print(
+                    f"Connection error: Failed to connect to {self.test_url} with User-Agent '{user_agent}'.")
                 return False
             except requests.exceptions.ProxyError:
-                print(f"Proxy error: Failed to connect using the proxy for User-Agent '{user_agent}'.")
+                # If a proxy error occurs, print an error message and return False
+                print(
+                    f"Proxy error: Failed to connect using the proxy for User-Agent '{user_agent}'.")
                 return False
             except requests.exceptions.InvalidURL:
+                # If an invalid URL error occurs, print an error message and return False
                 print(f"Invalid URL: The URL '{self.test_url}' is invalid.")
                 return False
             except requests.RequestException as e:
                 # Handle any other request exceptions, such as network errors
-                print(f"Error: User-Agent '{user_agent}' failed with exception: {e} for {self.test_url}.")
+                print(
+                    f"Error: User-Agent '{user_agent}' failed with exception: {e} for {self.test_url}.")
                 return False  # Request failed
 
     def filter_user_agents(self, user_agents_file, output_file):
         """
-        Filter user agents by testing them against a specific website with enhanced error handling.
 
-        Args:
-            user_agents_file (str): Path to the file containing user agents to test.
-            output_file (str): Path to the file where successful user agents will be saved.
+    Filter user agents by testing them against a specific website with enhanced error handling.
 
-        Returns:
-            list: A list of successful user agents that were accepted by the website.
+    This method reads a list of user agents from a specified input file, tests each user agent 
+    against a given website, and writes the successful user agents to an output file. The testing 
+    involves sending HTTP requests with each user agent and checking the server's response. It also 
+    incorporates error handling for file operations and network issues, along with delays between 
+    requests to mimic human browsing behavior.
+
+    Args:
+        user_agents_file (str): Path to the file containing user agents to test.
+        output_file (str): Path to the file where successful user agents will be saved.
+
+    Returns:
+        list: A list of successful user agents that were accepted by the website.
+
+    Method Details:
+    ---------------
+    - **Initialization**:
+        - A list named `successful_user_agents` is initialized to store user agents that successfully 
+          pass the test (i.e., receive a status code 200 from the server).
+    
+    - **Reading User Agents**:
+        - The method attempts to open and read the `user_agents_file` using a `with` statement to 
+          ensure proper file handling.
+        - If the file is not found (`FileNotFoundError`), an error message is printed, and the method 
+          returns an empty list.
+        - If an I/O error occurs (e.g., permission issues), an error message is printed, and the method 
+          returns an empty list.
+        - Upon successful reading, the number of user agents loaded is printed for user reference.
+    
+    - **Testing User Agents**:
+        - The method iterates over each user agent in the list `user_agents`.
+        - Each user agent is stripped of leading/trailing whitespace using `strip()`.
+        - If a user agent is an empty string (e.g., due to empty lines in the file), it is skipped.
+        - The `check_user_agent` method is called for each user agent to test its validity against the 
+          specified URL (`self.test_url`).
+        - If a user agent is successful (i.e., `check_user_agent` returns `True`), it is appended to 
+          `successful_user_agents`.
+        - A random delay between requests is introduced using `random.uniform(*self.delay_range)` to 
+          mimic human-like browsing behavior. The delay duration is printed for user reference.
+    
+    - **Writing Successful User Agents**:
+        - After testing all user agents, the method attempts to write the successful user agents to the 
+          `output_file`.
+        - A `with` statement is used to open the file in write mode, ensuring proper file handling.
+        - Each successful user agent is written to the file, one per line.
+        - If an I/O error occurs during writing (e.g., permission issues), an error message is printed, 
+          and the method returns an empty list.
+        - A success message is printed, indicating the number of user agents written to the output file.
+    
+    - **Final Checks**:
+        - If no successful user agents are found, a warning message is printed suggesting the use of a 
+          proxy, as the lack of success may indicate server restrictions or blocks.
+    
+    - **Return Value**:
+        - The method returns the list `successful_user_agents`, containing all user agents that 
+          successfully received a status code 200 from the server.
+
+        Overall, this method provides a complete and robust mechanism for filtering user agents by testing 
+        them against a specified website, ensuring that only effective user agents are retained. It handles 
+        file and network errors gracefully, provides informative output messages, and incorporates random 
+        delays to reduce detection risks.
+
         """
         # Initialize a list to store successful user agents
         successful_user_agents = []
 
+        # Attempt to read user agents from the specified file
         try:
             print(f"Reading user agents from: {user_agents_file}")
             with open(user_agents_file, 'r') as file:
                 user_agents = file.readlines()
         except FileNotFoundError:
+            # If the file is not found, print an error message and return an empty list
             print(f"Error: The file '{user_agents_file}' was not found.")
             return []
         except IOError:
-            print(f"Error: Unable to read the file '{user_agents_file}'. Check file permissions.")
+            # If there is an I/O error (e.g., permission issue), print an error message and return an empty list
+            print(
+                f"Error: Unable to read the file '{user_agents_file}'. Check file permissions.")
             return []
 
-        print(f"User agents loaded: {len(user_agents)}")  # Print the number of user agents loaded
+        # Print the number of user agents loaded
+        print(f"User agents loaded: {len(user_agents)}")
 
         # Test each user agent
         for user_agent in user_agents:
@@ -147,22 +296,27 @@ class UserAgentTester:
             print(f"Delaying for {delay:.2f} seconds before the next request")
             time.sleep(delay)
 
-        print(f"Successful user agents: {len(successful_user_agents)}")  # Print the number of successful user agents
+        # Print the number of successful user agents
+        print(f"Successful user agents: {len(successful_user_agents)}")
 
-        # Write the successful user agents to the output file
+        # Attempt to write the successful user agents to the output file
         try:
             print(f"Writing successful user agents to: {output_file}")
             with open(output_file, 'w') as f:
                 for agent in successful_user_agents:
                     f.write(agent + '\n')
-            print(f"Successfully wrote {len(successful_user_agents)} user agents to {output_file}.")
+            print(
+                f"Successfully wrote {len(successful_user_agents)} user agents to {output_file}.")
         except IOError:
-            print(f"Error: Unable to write to the file '{output_file}'. Check file permissions.")
+            # If there is an I/O error (e.g., permission issue), print an error message and return an empty list
+            print(
+                f"Error: Unable to write to the file '{output_file}'. Check file permissions.")
             return []
 
         # If no successful user agents are found, suggest using a proxy
         if len(successful_user_agents) == 0:
-            print("Warning: No successful user agents found. Consider using a proxy if not already used.")
+            print(
+                "Warning: No successful user agents found. Consider using a proxy if not already used.")
 
         # Return the list of successful user agents
         return successful_user_agents
