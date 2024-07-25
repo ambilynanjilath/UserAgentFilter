@@ -102,10 +102,10 @@ print("User agents have been filtered and saved to 'filtered_user_agents.txt'")
 ## Configuration Options
 
 - test_url: The URL of the website to test user agents against.
-- proxy: A dictionary containing proxy settings (optional).
-- timeout: The maximum amount of time to wait for a response (in seconds).
-- max_retries: The number of times to retry a request in case of transient errors.
-- delay_range: A tuple specifying the range (in seconds) for random delays between requests.
+- proxy: A dictionary containing proxy settings (optional).Use importantly in case of any 403 forbidden error.
+- timeout: The maximum amount of time to wait for a response (in seconds).Default value is 10.
+- max_retries: The number of times to retry a request in case of transient errors.Default value is 3.
+- delay_range: A tuple specifying the range (in seconds) for random delays between requests.Default value is (3,8).
 
 ## Contributing
 
