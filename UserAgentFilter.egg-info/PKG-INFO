@@ -1,3 +1,30 @@
+Metadata-Version: 2.1
+Name: UserAgentFilter
+Version: 1.0.0
+Summary: A package for testing user agents on specific websites
+Home-page: https://github.com/ambilynanjilath/UserAgentFilter.git
+Author: Ambily Biju & Shahana Farvin
+Author-email: ambilybiju2408@gmail.com,shahana50997@gmail.com
+License: UNKNOWN
+Project-URL: Documentation, https://github.com/ambilynanjilath/UserAgentFilter/blob/main/README.md
+Project-URL: Source, https://github.com/ambilynanjilath/UserAgentFilter
+Project-URL: Tracker, https://github.com/ambilynanjilath/UserAgentFilter/issues
+Keywords: user agent testing,web scraping,requests
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
 # UserAgentFilter
 ![UserAgentFilter Logo](https://github.com/ambilynanjilath/UserAgentFilter/blob/main/logo.png)
 
@@ -21,7 +48,7 @@
 You can install **UserAgentFilter** via pip. Run the following command:
 
 ```
-pip install UserAgentFilter==1.0.0
+pip install useragentfilter
 ```
 
 ## Usage
@@ -122,6 +149,8 @@ Contributions are welcome! If you would like to contribute to **UserAgentFilter*
 
 ## Contact
 If you have any questions, suggestions, or issues, please feel free to contact us at [shahana50997@gmail.com][ambilybiju2408@gmail.com].
+
+
 
 
 

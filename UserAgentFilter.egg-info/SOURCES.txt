@@ -1,0 +1,13 @@
+LICENSE
+MANIFEST.in
+README.md
+requirements.txt
+setup.py
+UserAgentFilter/__init__.py
+UserAgentFilter/tester.py
+UserAgentFilter/utils.py
+UserAgentFilter.egg-info/PKG-INFO
+UserAgentFilter.egg-info/SOURCES.txt
+UserAgentFilter.egg-info/dependency_links.txt
+UserAgentFilter.egg-info/requires.txt
+UserAgentFilter.egg-info/top_level.txt
