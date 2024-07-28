@@ -21,7 +21,8 @@
 You can install **UserAgentFilter** via pip. Run the following command:
 
 ```
-pip install UserAgentFilter==1.0.0
+pip install UserAgentFilter==1.0.0...
+
 ```
 
 ## Usage
@@ -41,7 +42,7 @@ Create an instance of the UserAgentTester class. You need to specify the URL of 
 ```
 tester = UserAgentTester(
     test_url='https://www.example.com',  # The URL to test user agents against
-    proxy={'http': 'http://your_proxy:port', 'https': 'https://your_proxy:port'},  # Optional proxy settings
+    proxy={'http://your_proxy:port', 'https://your_proxy:port'},  # Optional proxy settings
     timeout=10,  # Timeout for each request in seconds
     max_retries=3,  # Number of retries for each request
     delay_range=(3, 8)  # Random delay range between requests in seconds
