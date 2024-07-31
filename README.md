@@ -21,7 +21,7 @@
 You can install **UserAgentFilter** via pip. Run the following command:
 
 ```
-pip install UserAgentFilter==1.0.0...
+pip install UserAgentFilter==1.0.0
 
 ```
 
