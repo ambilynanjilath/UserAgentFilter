@@ -9,8 +9,7 @@ class TestUserAgentTester(unittest.TestCase):
         self.user_agents_file = 'tests/user_agents.txt'
         self.output_file = 'tests/filtered_test.txt'
         self.proxy = {
-            "https": "scraperapi.retry_404=true.country_code=us.device_type=desktop.session_number=456.keep_headers=true:13b50ee780e25089c9599d234627bc81@proxy-server.scraperapi.com:8001"
-        }
+            "https": "add_your_proxy"}
 
         # Ensure the user agents file exists
         if not os.path.isfile(self.user_agents_file):
